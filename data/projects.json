@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Cloud Platform Migration",
+    "description": "Migrating legacy core servers to serverless cloud infrastructure.",
+    "organizationId": 1,
+    "status": "active",
+    "createdAt": "2026-06-21T10:42:25.401Z"
+  },
+  {
+    "id": 2,
+    "name": "Mobile App Redesign",
+    "description": "Overhauling the iOS and Android application UI and experience.",
+    "organizationId": 1,
+    "status": "active",
+    "createdAt": "2026-06-21T10:42:25.401Z"
+  },
+  {
+    "id": 3,
+    "name": "TPS Reports System",
+    "description": "Automating the delivery of TPS reports with new cover sheets.",
+    "organizationId": 2,
+    "status": "active",
+    "createdAt": "2026-06-21T10:42:25.401Z"
+  }
+]

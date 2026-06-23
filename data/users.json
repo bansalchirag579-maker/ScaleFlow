@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "username": "alice",
+    "name": "Alice Smith",
+    "email": "alice@acme.com",
+    "role": "admin",
+    "organizationId": 1,
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-06-21T10:42:25.396Z"
+  },
+  {
+    "id": 2,
+    "username": "bob",
+    "name": "Bob Jones",
+    "email": "bob@acme.com",
+    "role": "manager",
+    "organizationId": 1,
+    "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-06-21T10:42:25.396Z"
+  },
+  {
+    "id": 3,
+    "username": "charlie",
+    "name": "Charlie Brown",
+    "email": "charlie@acme.com",
+    "role": "member",
+    "organizationId": 1,
+    "avatar": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-06-21T10:42:25.396Z"
+  },
+  {
+    "id": 4,
+    "username": "peter",
+    "name": "Peter Gibbons",
+    "email": "peter@initech.com",
+    "role": "admin",
+    "organizationId": 2,
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-06-21T10:42:25.396Z"
+  },
+  {
+    "id": 5,
+    "username": "samir",
+    "name": "Samir Nagheenanajar",
+    "email": "samir@initech.com",
+    "role": "member",
+    "organizationId": 2,
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    "createdAt": "2026-06-21T10:42:25.396Z"
+  }
+]

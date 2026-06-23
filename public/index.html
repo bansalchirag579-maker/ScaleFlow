@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScaleFlow | SaaS Team & Kanban Management System</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons (Modern icon kit) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Style Sheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  
+  <!-- App Container -->
+  <div class="app-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-area">
+          <div class="logo-icon">⚡</div>
+          <span class="logo-text">ScaleFlow</span>
+        </div>
+        <span class="badge-beta">SaaS Portal</span>
+      </div>
+      
+      <!-- Organization / Tenant Info -->
+      <div class="org-selector-area">
+        <div class="org-label">Current Organization</div>
+        <div class="org-display" id="org-display-btn">
+          <i data-lucide="building"></i>
+          <span id="current-org-name">Acme Cloud Corp</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#dashboard" class="nav-link active" data-view="dashboard">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#kanban" class="nav-link" data-view="kanban">
+              <i data-lucide="kanban-square"></i>
+              <span>Kanban Board</span>
+            </a>
+          </li>
+          <li>
+            <a href="#members" class="nav-link" data-view="members">
+              <i data-lucide="users"></i>
+              <span>Team Members</span>
+            </a>
+          </li>
+          <li>
+            <a href="#billing" class="nav-link" data-view="billing">
+              <i data-lucide="credit-card"></i>
+              <span>Billing & Plans</span>
+            </a>
+          </li>
+          <li>
+            <a href="#activity" class="nav-link" data-view="activity">
+              <i data-lucide="history"></i>
+              <span>Activity Log</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Demo Persona Switcher (Allows testing roles easily) -->
+      <div class="persona-switcher-area">
+        <div class="persona-label">Simulation Identity <i data-lucide="help-circle" class="help-tooltip" title="Switch identities to test different roles (Admin, Manager, Member)"></i></div>
+        <select id="user-switch-dropdown" class="form-select">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <!-- Logged-in User Profile (Footer of Sidebar) -->
+      <div class="user-profile-footer">
+        <img id="current-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="avatar-sm">
+        <div class="user-info">
+          <div class="user-name" id="current-user-name">Bob Jones</div>
+          <div class="user-role-badge" id="current-user-role">Manager</div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Dashboard</h1>
+          
+          <!-- Project Selection (Visible primarily in Kanban) -->
+          <div class="project-selector-container hidden" id="header-project-selector">
+            <label for="project-select">Active Project:</label>
+            <select id="project-select" class="form-select project-dropdown">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
+        
+        <div class="header-right">
+          <button class="btn btn-primary" id="btn-create-project">
+            <i data-lucide="plus"></i>
+            <span>New Project</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Dynamic Views Wrapper -->
+      <div class="view-container">
+        
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-panel active">
+          <!-- Stats Grid -->
+          <div class="stats-grid">
+            <div class="stat-card glass-card">
+              <div class="stat-header">
+                <span class="stat-title">Active Projects</span>
+                <i data-lucide="folder-git-2" class="text-primary"></i>
+              </div>
+              <div class="stat-value" id="stat-projects-val">0</div>
+              <div class="stat-footer">
+                <span class="stat-trend" id="stat-projects-limit">Limit: 2</span>
+              </div>
+            </div>
+            
+            <div class="stat-card glass-card">
+              <div class="stat-header">
+                <span class="stat-title">Tasks (All Projects)</span>
+                <i data-lucide="check-square" class="text-success"></i>
+              </div>
+              <div class="stat-value" id="stat-tasks-val">0</div>
+              <div class="stat-footer">
+                <span class="stat-trend" id="stat-tasks-limit">Limit: 5</span>
+              </div>
+            </div>
+            
+            <div class="stat-card glass-card">
+              <div class="stat-header">
+                <span class="stat-title">Team Members</span>
+                <i data-lucide="users-2" class="text-warning"></i>
+              </div>
+              <div class="stat-value" id="stat-members-val">0</div>
+              <div class="stat-footer">
+                <span class="stat-trend" id="stat-members-limit">Limit: 3</span>
+              </div>
+            </div>
+            
+            <div class="stat-card glass-card">
+              <div class="stat-header">
+                <span class="stat-title">Subscription Level</span>
+                <i data-lucide="zap" class="text-accent"></i>
+              </div>
+              <div class="stat-value tier-premium" id="stat-tier-val">FREE</div>
+              <div class="stat-footer">
+                <a href="#billing" class="stat-action-link" id="upgrade-quick-link">Manage subscription</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mid Section: Chart and Projects List -->
+          <div class="dashboard-mid-grid">
+            
+            <!-- Left: Task breakdown Chart -->
+            <div class="glass-card chart-container-card">
+              <h3>Task Status Distribution</h3>
+              <div class="chart-wrapper">
+                <canvas id="taskStatusChart" width="300" height="200"></canvas>
+                <!-- Fallback representation if drawing fails -->
+                <div id="chart-fallback" class="chart-fallback hidden">
+                  <div class="fallback-bar" style="--val: 40%; --color: var(--todo);"><span>To Do</span></div>
+                  <div class="fallback-bar" style="--val: 30%; --color: var(--inprogress);"><span>In Progress</span></div>
+                  <div class="fallback-bar" style="--val: 15%; --color: var(--inreview);"><span>In Review</span></div>
+                  <div class="fallback-bar" style="--val: 15%; --color: var(--done);"><span>Done</span></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right: Project List -->
+            <div class="glass-card dashboard-project-list">
+              <div class="card-header-actions">
+                <h3>Projects</h3>
+                <button class="btn btn-secondary btn-sm" id="btn-dashboard-new-project">+ Create</button>
+              </div>
+              <div class="project-list-items" id="dashboard-project-items">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            
+          </div>
+          
+          <!-- Bottom Section: Quick activity feed & Team Summary -->
+          <div class="dashboard-bottom-grid">
+            <!-- Feed -->
+            <div class="glass-card dashboard-feed-card">
+              <h3>Recent Actions</h3>
+              <div class="activity-feed-mini" id="dashboard-activity-feed">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            <!-- Limits and Billing Warnings -->
+            <div class="glass-card billing-limit-meter-card">
+              <h3>SaaS Allocation Usage</h3>
+              <div class="usage-meter-group">
+                <div class="usage-label">
+                  <span>Projects</span>
+                  <span id="meter-projects-text">0 / 2</span>
+                </div>
+                <div class="meter-bar-bg">
+                  <div class="meter-bar-fill" id="meter-projects-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="usage-meter-group">
+                <div class="usage-label">
+                  <span>Tasks</span>
+                  <span id="meter-tasks-text">0 / 5</span>
+                </div>
+                <div class="meter-bar-bg">
+                  <div class="meter-bar-fill" id="meter-tasks-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="usage-meter-group">
+                <div class="usage-label">
+                  <span>Team Seats</span>
+                  <span id="meter-members-text">0 / 3</span>
+                </div>
+                <div class="meter-bar-bg">
+                  <div class="meter-bar-fill" id="meter-members-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              
+              <div class="alert-box-info info-tier-upgrade hidden" id="free-tier-warning">
+                <i data-lucide="alert-triangle"></i>
+                <div class="alert-text">
+                  <strong>Free Tier Limits Active</strong><br>
+                  You are approaching limits. Upgrade to Pro for extra seats, projects, and tasks.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- 2. KANBAN BOARD VIEW -->
+        <section id="view-kanban" class="view-panel">
+          <!-- Kanban Toolbar -->
+          <div class="kanban-toolbar">
+            <div class="filters">
+              <span class="filter-label">Filter:</span>
+              <button class="filter-btn active" data-priority="all">All Priorities</button>
+              <button class="filter-btn" data-priority="high">High</button>
+              <button class="filter-btn" data-priority="medium">Medium</button>
+              <button class="filter-btn" data-priority="low">Low</button>
+            </div>
+            <button class="btn btn-secondary" id="btn-add-task-kanban">
+              <i data-lucide="plus-circle"></i> Add Task
+            </button>
+          </div>
+          
+          <!-- Board columns -->
+          <div class="kanban-board">
+            
+            <!-- Column 1 -->
+            <div class="kanban-column" id="col-todo" data-status="todo">
+              <div class="column-header">
+                <div class="col-title-badge">
+                  <span class="status-indicator indicator-todo"></span>
+                  <h4>To Do</h4>
+                </div>
+                <span class="task-count" id="count-todo">0</span>
+              </div>
+              <div class="kanban-cards-container" id="container-todo">
+                <!-- Tasks render here -->
+              </div>
+            </div>
+            
+            <!-- Column 2 -->
+            <div class="kanban-column" id="col-inprogress" data-status="in_progress">
+              <div class="column-header">
+                <div class="col-title-badge">
+                  <span class="status-indicator indicator-inprogress"></span>
+                  <h4>In Progress</h4>
+                </div>
+                <span class="task-count" id="count-inprogress">0</span>
+              </div>
+              <div class="kanban-cards-container" id="container-inprogress">
+                <!-- Tasks render here -->
+              </div>
+            </div>
+            
+            <!-- Column 3 -->
+            <div class="kanban-column" id="col-inreview" data-status="in_review">
+              <div class="column-header">
+                <div class="col-title-badge">
+                  <span class="status-indicator indicator-inreview"></span>
+                  <h4>In Review</h4>
+                </div>
+                <span class="task-count" id="count-inreview">0</span>
+              </div>
+              <div class="kanban-cards-container" id="container-inreview">
+                <!-- Tasks render here -->
+              </div>
+            </div>
+            
+            <!-- Column 4 -->
+            <div class="kanban-column" id="col-done" data-status="done">
+              <div class="column-header">
+                <div class="col-title-badge">
+                  <span class="status-indicator indicator-done"></span>
+                  <h4>Completed</h4>
+                </div>
+                <span class="task-count" id="count-done">0</span>
+              </div>
+              <div class="kanban-cards-container" id="container-done">
+                <!-- Tasks render here -->
+              </div>
+            </div>
+            
+          </div>
+        </section>
+        
+        <!-- 3. TEAM MEMBERS VIEW -->
+        <section id="view-members" class="view-panel">
+          <div class="view-header-row">
+            <p class="section-desc">Manage profiles, role permissions, and organization invites.</p>
+            <button class="btn btn-primary" id="btn-invite-member">
+              <i data-lucide="user-plus"></i> Invite Team Member
+            </button>
+          </div>
+          
+          <div class="glass-card table-responsive-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Date Joined</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <!-- 4. BILLING & PLANS VIEW -->
+        <section id="view-billing" class="view-panel">
+          <!-- Active Plan Header -->
+          <div class="billing-header-card glass-card">
+            <div class="header-main-details">
+              <div>
+                <h2>Current Subscription Plan: <span class="active-plan-badge" id="billing-active-plan">Pro Plan</span></h2>
+                <p>Isolated workspace quotas and resource restrictions are enforced automatically on the server.</p>
+              </div>
+              <div class="billing-status-badge">Active</div>
+            </div>
+          </div>
+          
+          <!-- Pricing grid -->
+          <div class="pricing-grid">
+            
+            <!-- Free Plan -->
+            <div class="pricing-card glass-card" id="pricing-card-free">
+              <div class="pricing-badge">Basic Sandbox</div>
+              <h3 class="plan-name">Free Tier</h3>
+              <div class="plan-price">$0 <span>/ month</span></div>
+              <p class="plan-description">For small side projects and workspace trial runs.</p>
+              
+              <ul class="plan-features">
+                <li><i data-lucide="check"></i> Max 2 Projects</li>
+                <li><i data-lucide="check"></i> Max 5 Tasks</li>
+                <li><i data-lucide="check"></i> Max 3 Team Members</li>
+                <li><i data-lucide="check"></i> Standard Activity log</li>
+              </ul>
+              
+              <button class="btn btn-pricing btn-secondary" data-tier-select="free" id="btn-select-free">Select Plan</button>
+            </div>
+            
+            <!-- Pro Plan (Popular) -->
+            <div class="pricing-card glass-card popular-plan" id="pricing-card-pro">
+              <div class="pricing-badge-popular">Most Popular</div>
+              <h3 class="plan-name">Pro Tier</h3>
+              <div class="plan-price">$49 <span>/ month</span></div>
+              <p class="plan-description">For growing product teams and small agencies.</p>
+              
+              <ul class="plan-features">
+                <li><i data-lucide="check"></i> Max 10 Projects</li>
+                <li><i data-lucide="check"></i> Max 50 Tasks</li>
+                <li><i data-lucide="check"></i> Max 15 Team Members</li>
+                <li><i data-lucide="check"></i> Comprehensive dashboard</li>
+                <li><i data-lucide="check"></i> Task Priorities & Comments</li>
+              </ul>
+              
+              <button class="btn btn-pricing btn-primary" data-tier-select="pro" id="btn-select-pro">Select Plan</button>
+            </div>
+            
+            <!-- Enterprise Plan -->
+            <div class="pricing-card glass-card" id="pricing-card-enterprise">
+              <div class="pricing-badge">Corporate</div>
+              <h3 class="plan-name">Enterprise</h3>
+              <div class="plan-price">$199 <span>/ month</span></div>
+              <p class="plan-description">For organizations requiring scale, security, and velocity.</p>
+              
+              <ul class="plan-features">
+                <li><i data-lucide="check"></i> Unlimited Projects</li>
+                <li><i data-lucide="check"></i> Unlimited Tasks</li>
+                <li><i data-lucide="check"></i> Unlimited Team Members</li>
+                <li><i data-lucide="check"></i> High performance backend</li>
+                <li><i data-lucide="check"></i> 24/7 Priority Support</li>
+              </ul>
+              
+              <button class="btn btn-pricing btn-secondary" data-tier-select="enterprise" id="btn-select-enterprise">Select Plan</button>
+            </div>
+            
+          </div>
+          
+          <!-- SaaS Quote limits warnings -->
+          <div class="glass-card billing-limit-meters-detail">
+            <h3>SaaS Resource Utilization Breakdown</h3>
+            <div class="meter-detail-item">
+              <div class="details-text-row">
+                <span>Projects Capacity</span>
+                <span id="billing-projects-usage-text">2 of 2 used</span>
+              </div>
+              <div class="billing-progress-bar-bg">
+                <div class="billing-progress-bar-fill" id="billing-projects-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+            <div class="meter-detail-item">
+              <div class="details-text-row">
+                <span>Tasks Allocated</span>
+                <span id="billing-tasks-usage-text">4 of 5 used</span>
+              </div>
+              <div class="billing-progress-bar-bg">
+                <div class="billing-progress-bar-fill" id="billing-tasks-fill" style="width: 80%;"></div>
+              </div>
+            </div>
+            <div class="meter-detail-item">
+              <div class="details-text-row">
+                <span>Seats Filled</span>
+                <span id="billing-members-usage-text">3 of 3 used</span>
+              </div>
+              <div class="billing-progress-bar-bg">
+                <div class="billing-progress-bar-fill" id="billing-members-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- 5. ACTIVITY LOG VIEW -->
+        <section id="view-activity" class="view-panel">
+          <p class="section-desc">Audit logs mapping actions across projects, task changes, and workspace members.</p>
+          <div class="glass-card activity-timeline-card">
+            <div class="activity-timeline" id="activity-full-timeline">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- ================= MODALS ================= -->
+  
+  <!-- 1. Create Project Modal -->
+  <div class="modal-overlay hidden" id="modal-create-project">
+    <div class="modal-box glass-card">
+      <div class="modal-header">
+        <h3>Create New Project</h3>
+        <button class="btn-close" id="btn-close-project-modal"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-create-project">
+        <div class="form-group">
+          <label for="new-project-name">Project Name <span class="required">*</span></label>
+          <input type="text" id="new-project-name" class="form-control" placeholder="e.g. Mobile Application V2" required>
+        </div>
+        <div class="form-group">
+          <label for="new-project-desc">Description</label>
+          <textarea id="new-project-desc" class="form-control" rows="3" placeholder="Brief outline of the project scope..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-project-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 2. Create Task Modal -->
+  <div class="modal-overlay hidden" id="modal-create-task">
+    <div class="modal-box glass-card">
+      <div class="modal-header">
+        <h3>Add Board Task</h3>
+        <button class="btn-close" id="btn-close-task-modal"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-create-task">
+        <div class="form-group">
+          <label for="new-task-project">Project <span class="required">*</span></label>
+          <select id="new-task-project" class="form-select" required>
+            <!-- Loaded dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="new-task-title">Task Title <span class="required">*</span></label>
+          <input type="text" id="new-task-title" class="form-control" placeholder="What needs to be done?" required>
+        </div>
+        <div class="form-group">
+          <label for="new-task-desc">Description</label>
+          <textarea id="new-task-desc" class="form-control" rows="3" placeholder="Acceptance criteria or guidelines..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-6">
+            <label for="new-task-priority">Priority</label>
+            <select id="new-task-priority" class="form-select">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-group col-6">
+            <label for="new-task-assignee">Assignee</label>
+            <select id="new-task-assignee" class="form-select">
+              <!-- Loaded dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-task-due">Due Date</label>
+          <input type="date" id="new-task-due" class="form-control">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-task-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Edit / View Task Details Modal -->
+  <div class="modal-overlay hidden" id="modal-task-details">
+    <div class="modal-box modal-lg glass-card">
+      <div class="modal-header">
+        <span class="project-tag-badge" id="detail-project-name">Project Name</span>
+        <button class="btn-close" id="btn-close-detail-modal"><i data-lucide="x"></i></button>
+      </div>
+      
+      <div class="detail-split-layout">
+        <!-- Left Column: Primary task details, desc, comments -->
+        <div class="detail-primary">
+          <h2 id="detail-task-title" class="editable-title" contenteditable="true" title="Click to edit title">Task Title</h2>
+          
+          <div class="detail-section">
+            <label>Description</label>
+            <div id="detail-task-desc" class="editable-desc" contenteditable="true" placeholder="Add a description...">Task Description goes here...</div>
+            <button class="btn btn-secondary btn-xs hidden" id="btn-save-desc">Save Description</button>
+          </div>
+          
+          <div class="detail-section comments-section">
+            <h3>Discussion</h3>
+            <div class="comments-list" id="detail-comments-list">
+              <!-- Populated dynamically -->
+            </div>
+            
+            <form id="form-add-comment" class="comment-input-area">
+              <img id="comment-user-avatar" src="" alt="Me" class="avatar-xs">
+              <input type="text" id="new-comment-text" class="form-control" placeholder="Write a comment..." required>
+              <button type="submit" class="btn btn-secondary btn-sm">Comment</button>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Right Column: Metadata status, priority, assignee, delete -->
+        <div class="detail-sidebar">
+          <div class="sidebar-item">
+            <label>Status</label>
+            <select id="detail-task-status" class="form-select status-select-styled">
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="in_review">In Review</option>
+              <option value="done">Completed</option>
+            </select>
+          </div>
+          
+          <div class="sidebar-item">
+            <label>Priority</label>
+            <select id="detail-task-priority" class="form-select">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          
+          <div class="sidebar-item">
+            <label>Assignee</label>
+            <select id="detail-task-assignee" class="form-select">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          
+          <div class="sidebar-item">
+            <label>Due Date</label>
+            <input type="date" id="detail-task-due" class="form-control">
+          </div>
+          
+          <div class="sidebar-footer">
+            <button class="btn btn-danger btn-block" id="btn-delete-task">
+              <i data-lucide="trash-2"></i> Delete Task
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 4. Invite Team Member Modal -->
+  <div class="modal-overlay hidden" id="modal-invite-member">
+    <div class="modal-box glass-card">
+      <div class="modal-header">
+        <h3>Invite Team Member</h3>
+        <button class="btn-close" id="btn-close-invite-modal"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-invite-member">
+        <div class="form-group">
+          <label for="invite-name">Full Name <span class="required">*</span></label>
+          <input type="text" id="invite-name" class="form-control" placeholder="e.g. Sarah Connor" required>
+        </div>
+        <div class="form-group">
+          <label for="invite-username">Username <span class="required">*</span></label>
+          <input type="text" id="invite-username" class="form-control" placeholder="e.g. sarahc" required>
+        </div>
+        <div class="form-group">
+          <label for="invite-email">Email Address <span class="required">*</span></label>
+          <input type="email" id="invite-email" class="form-control" placeholder="sarah@company.com" required>
+        </div>
+        <div class="form-group">
+          <label for="invite-role">Workspace Role</label>
+          <select id="invite-role" class="form-select">
+            <option value="member" selected>Member (Can edit tasks assigned, view workspace)</option>
+            <option value="manager">Manager (Can edit projects/tasks, invite users)</option>
+            <option value="admin">Administrator (Full settings control & billing access)</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-invite-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send Invitation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 5. General Alert Modal (Used for subscription limit errors) -->
+  <div class="modal-overlay hidden" id="modal-alert">
+    <div class="modal-box glass-card alert-modal-box">
+      <div class="alert-icon-container">
+        <i data-lucide="shield-alert"></i>
+      </div>
+      <h3 id="alert-modal-title">Limit Exceeded</h3>
+      <p id="alert-modal-message">Your current workspace tier restricts this action. Upgrade your subscription to continue.</p>
+      <div class="modal-footer flex-center">
+        <button class="btn btn-secondary" id="btn-close-alert-modal">Dismiss</button>
+        <button class="btn btn-primary" id="btn-upgrade-alert-modal">Upgrade Now</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

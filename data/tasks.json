@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1,
+    "projectId": 1,
+    "organizationId": 1,
+    "title": "Setup Kubernetes clusters",
+    "description": "Configure staging and production K8s clusters in AWS.",
+    "status": "in_progress",
+    "priority": "high",
+    "assigneeId": 2,
+    "dueDate": "2026-07-15",
+    "comments": [
+      {
+        "id": 1,
+        "author": "Alice Smith",
+        "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+        "text": "Please use Terraform for the config.",
+        "createdAt": "2026-06-21T10:42:25.402Z"
+      }
+    ],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  },
+  {
+    "id": 2,
+    "projectId": 1,
+    "organizationId": 1,
+    "title": "Migrate Auth Service to JWT",
+    "description": "Replace legacy cookie sessions with secure stateless JWT authorization.",
+    "status": "done",
+    "priority": "high",
+    "assigneeId": 1,
+    "dueDate": "2026-06-10",
+    "comments": [],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  },
+  {
+    "id": 3,
+    "projectId": 1,
+    "organizationId": 1,
+    "title": "Database replication testing",
+    "description": "Conduct load testing and failover simulation on replica DB instances.",
+    "status": "todo",
+    "priority": "medium",
+    "assigneeId": 3,
+    "dueDate": "2026-07-20",
+    "comments": [],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  },
+  {
+    "id": 4,
+    "projectId": 2,
+    "organizationId": 1,
+    "title": "Design Figma layouts for Home screen",
+    "description": "Create interactive wireframes for the redesigned home and navigation tabs.",
+    "status": "in_review",
+    "priority": "high",
+    "assigneeId": 2,
+    "dueDate": "2026-06-30",
+    "comments": [
+      {
+        "id": 1,
+        "author": "Alice Smith",
+        "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+        "text": "The profile icon should be moved to the top right corner.",
+        "createdAt": "2026-06-21T10:42:25.402Z"
+      }
+    ],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  },
+  {
+    "id": 5,
+    "projectId": 2,
+    "organizationId": 1,
+    "title": "Setup React Native codebase",
+    "description": "Boilertplate app initialization and setup main navigation routing package.",
+    "status": "todo",
+    "priority": "low",
+    "assigneeId": 3,
+    "dueDate": "2026-08-01",
+    "comments": [],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  },
+  {
+    "id": 6,
+    "projectId": 3,
+    "organizationId": 2,
+    "title": "Design new cover sheets",
+    "description": "Draft standard layouts for the new required TPS report cover sheets.",
+    "status": "in_progress",
+    "priority": "high",
+    "assigneeId": 5,
+    "dueDate": "2026-06-25",
+    "comments": [
+      {
+        "id": 1,
+        "author": "Peter Gibbons",
+        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
+        "text": "Did you get the memo about this?",
+        "createdAt": "2026-06-21T10:42:25.402Z"
+      }
+    ],
+    "createdAt": "2026-06-21T10:42:25.402Z"
+  }
+]

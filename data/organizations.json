@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Acme Cloud Corp",
+    "slug": "acme-cloud",
+    "tier": "pro",
+    "createdAt": "2026-06-21T10:42:25.386Z"
+  },
+  {
+    "id": 2,
+    "name": "Initech Software",
+    "slug": "initech",
+    "tier": "free",
+    "createdAt": "2026-06-21T10:42:25.394Z"
+  }
+]

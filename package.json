@@ -1,0 +1,14 @@
+{
+  "name": "saas-team-management",
+  "version": "1.0.0",
+  "description": "Premium SaaS Team Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "private": true
+}
