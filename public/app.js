@@ -33,10 +33,18 @@ async function apiCall(endpoint, method = 'GET', body = null) {
   
   try {
     const response = await fetch(endpoint, config);
-    const data = await response.json();
+    
+    // Check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Server returned non-JSON response (${response.status}): ${text.substring(0, 150)}`);
+    }
     
     if (!response.ok) {
-      // If server returns error, reject with custom message
       throw new Error(data.error || 'Server error occurred');
     }
     
