@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuration
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/scaleflow';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://chiragbansal_1234:Gy6Tjw2foXfDwUzB@codewars.ewpjgdh.mongodb.net/scaleflow?retryWrites=true&w=majority&appName=codewars';
 const JWT_SECRET = process.env.JWT_SECRET || 'scaleflow_jwt_super_secret_key';
 
 // Connect to MongoDB
