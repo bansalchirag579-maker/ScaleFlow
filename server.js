@@ -71,6 +71,22 @@ const logActivity = async (orgId, user, action, target) => {
   }
 };
 
+// Diagnostic Endpoint for checking DB connectivity
+app.get('/api/diag', (req, res) => {
+  const states = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+  res.json({
+    status: 'ok',
+    dbState: states[mongoose.connection.readyState] || 'unknown',
+    envUriPresent: !!process.env.MONGODB_URI,
+    envSecretPresent: !!process.env.JWT_SECRET
+  });
+});
+
 // --- AUTH & PUBLIC APIs ---
 
 // 1. Register API (Create Organization + Admin user)
