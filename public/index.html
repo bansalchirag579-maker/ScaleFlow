@@ -85,12 +85,15 @@
       </div>
 
       <!-- Logged-in User Profile (Footer of Sidebar) -->
-      <div class="user-profile-footer">
-        <img id="current-user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="avatar-sm">
-        <div class="user-info">
-          <div class="user-name" id="current-user-name">Bob Jones</div>
-          <div class="user-role-badge" id="current-user-role">Manager</div>
+      <div class="user-profile-footer" style="position: relative; display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex-grow: 1;">
+          <img id="current-user-avatar" src="" alt="Avatar" class="avatar-sm">
+          <div class="user-info" style="overflow: hidden;">
+            <div class="user-name" id="current-user-name" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">Loading...</div>
+            <div class="user-role-badge" id="current-user-role">Member</div>
+          </div>
         </div>
+        <button id="btn-logout" class="btn-close" title="Log Out" style="padding: 6px; margin-left: 8px; flex-shrink: 0;"><i data-lucide="log-out" style="width: 16px; height: 16px; color: var(--text-muted);"></i></button>
       </div>
     </aside>
     

@@ -1,3 +1,9 @@
+// TOKEN INITIAL VERIFICATION
+const token = localStorage.getItem('scaleflow_token');
+if (!token && !window.location.pathname.endsWith('login.html')) {
+  window.location.href = '/login.html';
+}
+
 // STATE MANAGEMENT
 const state = {
   currentUser: null,
@@ -13,13 +19,18 @@ const state = {
 
 // API HELPER
 async function apiCall(endpoint, method = 'GET', body = null) {
+  const token = localStorage.getItem('scaleflow_token');
+  if (!token && !window.location.pathname.endsWith('login.html')) {
+    window.location.href = '/login.html';
+    return;
+  }
+
   const headers = {
     'Content-Type': 'application/json'
   };
   
-  // Attach simulation user header
-  if (state.currentUser) {
-    headers['x-user-id'] = state.currentUser.id.toString();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
   
   const config = {
@@ -34,6 +45,13 @@ async function apiCall(endpoint, method = 'GET', body = null) {
   try {
     const response = await fetch(endpoint, config);
     
+    // Auto-logout if token is expired or unauthorized
+    if (response.status === 401 && !window.location.pathname.endsWith('login.html')) {
+      localStorage.removeItem('scaleflow_token');
+      window.location.href = '/login.html';
+      return;
+    }
+
     // Check if the response is JSON
     const contentType = response.headers.get('content-type');
     let data;
@@ -724,15 +742,26 @@ function setupEventListeners() {
   
   // 1. Switch User Dropdown Switcher
   document.getElementById('user-switch-dropdown').addEventListener('change', async (e) => {
-    const newUserId = parseInt(e.target.value);
-    const user = state.allUsers.find(u => u.id === newUserId);
-    if (user) {
-      state.currentUser = user;
+    const newUserId = e.target.value;
+    try {
+      const result = await apiCall('/api/auth/switch-demo-identity', 'POST', { userId: newUserId });
+      localStorage.setItem('scaleflow_token', result.token);
       await loadSession();
       // Reload active panel
       navigateTo(state.activeView);
+    } catch (err) {
+      showErrorAlert('Identity Switch Error', err.message);
     }
   });
+
+  // Logout Button
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      localStorage.removeItem('scaleflow_token');
+      window.location.href = '/login.html';
+    });
+  }
   
   // 2. Create Project Modal Toggles
   const modalProj = document.getElementById('modal-create-project');
@@ -761,7 +790,7 @@ function setupEventListeners() {
   
   // 3. Project Selection Dropdown Change
   document.getElementById('project-select').addEventListener('change', (e) => {
-    state.activeProjectId = parseInt(e.target.value);
+    state.activeProjectId = e.target.value;
     renderKanbanTasks();
   });
   
@@ -776,11 +805,11 @@ function setupEventListeners() {
   
   document.getElementById('form-create-task').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const projectId = parseInt(document.getElementById('new-task-project').value);
+    const projectId = document.getElementById('new-task-project').value;
     const title = document.getElementById('new-task-title').value;
     const description = document.getElementById('new-task-desc').value;
     const priority = document.getElementById('new-task-priority').value;
-    const assigneeId = document.getElementById('new-task-assignee').value ? parseInt(document.getElementById('new-task-assignee').value) : null;
+    const assigneeId = document.getElementById('new-task-assignee').value || null;
     const dueDate = document.getElementById('new-task-due').value;
     
     try {
@@ -814,7 +843,7 @@ function setupEventListeners() {
       const container = col.querySelector('.kanban-cards-container');
       container.classList.remove('drag-over');
       
-      const taskId = parseInt(e.dataTransfer.getData('text/plain'));
+      const taskId = e.dataTransfer.getData('text/plain');
       const newStatus = col.getAttribute('data-status');
       
       // Update locally first for smooth visual response
@@ -986,7 +1015,7 @@ function setupEventListeners() {
   document.getElementById('detail-task-assignee').addEventListener('change', async (e) => {
     if (!activeDetailTask) return;
     const assigneeVal = e.target.value;
-    const newAssigneeId = assigneeVal ? parseInt(assigneeVal) : null;
+    const newAssigneeId = assigneeVal || null;
     try {
       const updated = await apiCall(`/api/tasks/${activeDetailTask.id}`, 'PUT', { assigneeId: newAssigneeId });
       activeDetailTask.assigneeId = updated.assigneeId;
