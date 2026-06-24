@@ -111,6 +111,7 @@ async function loadSession() {
     
     // Render static header/sidebar elements
     renderSidebarAndIdentity();
+    applyRolePermissions();
     
   } catch (error) {
     showErrorAlert('Initialization Error', 'Could not sync database session. Make sure node server is active.');
@@ -144,6 +145,49 @@ function renderSidebarAndIdentity() {
   });
   
   lucide.createIcons();
+}
+
+// APPLY ROLE-BASED VISIBILITY & CONTROLS ON THE FRONTEND
+function applyRolePermissions() {
+  if (!state.currentUser) return;
+  
+  const role = state.currentUser.role;
+  const isAdminOrManager = (role === 'admin' || role === 'manager');
+  
+  // 1. Create Project Buttons
+  const btnCreateProject = document.getElementById('btn-create-project');
+  const btnDashNewProject = document.getElementById('btn-dashboard-new-project');
+  
+  if (btnCreateProject && !isAdminOrManager) {
+    btnCreateProject.classList.add('hidden');
+  }
+  if (btnDashNewProject) {
+    if (isAdminOrManager) {
+      btnDashNewProject.classList.remove('hidden');
+    } else {
+      btnDashNewProject.classList.add('hidden');
+    }
+  }
+
+  // 2. Add Task Button (Kanban)
+  const btnAddTask = document.getElementById('btn-add-task-kanban');
+  if (btnAddTask) {
+    if (isAdminOrManager) {
+      btnAddTask.classList.remove('hidden');
+    } else {
+      btnAddTask.classList.add('hidden');
+    }
+  }
+
+  // 3. Invite Member Button
+  const btnInvite = document.getElementById('btn-invite-member');
+  if (btnInvite) {
+    if (isAdminOrManager) {
+      btnInvite.classList.remove('hidden');
+    } else {
+      btnInvite.classList.add('hidden');
+    }
+  }
 }
 
 // ROUTING / VIEW NAVIGATION
@@ -419,6 +463,14 @@ function renderKanbanTasks() {
       
       // HTML5 Drag Event Listeners
       card.addEventListener('dragstart', (e) => {
+        const role = state.currentUser.role;
+        const isAssignee = String(task.assigneeId) === String(state.currentUser.id);
+        const isAdminOrManager = (role === 'admin' || role === 'manager');
+        if (!isAdminOrManager && !isAssignee) {
+          e.preventDefault();
+          showErrorAlert('Access Restrained', 'Regular members can only drag and drop tasks assigned to them.');
+          return;
+        }
         card.classList.add('dragging');
         e.dataTransfer.setData('text/plain', task.id);
         e.dataTransfer.effectAllowed = 'move';
@@ -878,9 +930,10 @@ function setupEventListeners() {
     const username = document.getElementById('invite-username').value;
     const email = document.getElementById('invite-email').value;
     const role = document.getElementById('invite-role').value;
+    const password = document.getElementById('invite-password').value;
     
     try {
-      await apiCall('/api/members', 'POST', { name, username, email, role });
+      await apiCall('/api/members', 'POST', { name, username, email, role, password });
       closeModal(modalInvite);
       e.target.reset();
       await loadSession();
@@ -1153,6 +1206,51 @@ function openTaskDetailsModal(task) {
   
   // Load comments
   renderCommentsList(task.comments || []);
+  
+  // Set editable controls based on user role and assignment
+  const role = state.currentUser.role;
+  const isAssignee = String(task.assigneeId) === String(state.currentUser.id);
+  const isAdminOrManager = (role === 'admin' || role === 'manager');
+  
+  const titleEl = document.getElementById('detail-task-title');
+  const descEl = document.getElementById('detail-task-desc');
+  const statusEl = document.getElementById('detail-task-status');
+  const priorityEl = document.getElementById('detail-task-priority');
+  const assigneeEl = document.getElementById('detail-task-assignee');
+  const dueEl = document.getElementById('detail-task-due');
+  const deleteBtn = document.getElementById('btn-delete-task');
+  
+  if (isAdminOrManager) {
+    titleEl.contentEditable = "true";
+    descEl.contentEditable = "true";
+    titleEl.setAttribute('title', 'Click to edit title');
+    descEl.setAttribute('placeholder', 'Add a description...');
+    statusEl.disabled = false;
+    priorityEl.disabled = false;
+    assigneeEl.disabled = false;
+    dueEl.disabled = false;
+    deleteBtn.classList.remove('hidden');
+  } else if (isAssignee) {
+    titleEl.contentEditable = "true";
+    descEl.contentEditable = "true";
+    titleEl.setAttribute('title', 'Click to edit title');
+    descEl.setAttribute('placeholder', 'Add a description...');
+    statusEl.disabled = false;
+    priorityEl.disabled = true;
+    assigneeEl.disabled = true;
+    dueEl.disabled = true;
+    deleteBtn.classList.add('hidden');
+  } else {
+    titleEl.contentEditable = "false";
+    descEl.contentEditable = "false";
+    titleEl.removeAttribute('title');
+    descEl.setAttribute('placeholder', 'No description provided');
+    statusEl.disabled = true;
+    priorityEl.disabled = true;
+    assigneeEl.disabled = true;
+    dueEl.disabled = true;
+    deleteBtn.classList.add('hidden');
+  }
   
   // Show Modal
   openModal(document.getElementById('modal-task-details'));

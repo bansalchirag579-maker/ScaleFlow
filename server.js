@@ -246,8 +246,13 @@ app.get('/api/members', authMiddleware, async (req, res) => {
 // 6. Invite Member API (checks limits!)
 app.post('/api/members', authMiddleware, async (req, res) => {
   const { name, email, role, username, password } = req.body;
-  if (!name || !email || !role || !username) {
-    return res.status(400).json({ error: 'Name, email, username, and role are required.' });
+  if (!name || !email || !role || !username || !password) {
+    return res.status(400).json({ error: 'Name, email, username, role, and temporary password are required.' });
+  }
+
+  // Authorization check: Only admin and manager can invite members
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Access Restrained: Only administrators and managers can invite new members.' });
   }
 
   try {
@@ -313,6 +318,11 @@ app.post('/api/projects', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Project name is required.' });
   }
 
+  // Authorization check: Only admin and manager can create projects
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Access Restrained: Only administrators and managers can create projects.' });
+  }
+
   try {
     // Check limits
     const projectsCount = await Project.countDocuments({ organizationId: req.org._id });
@@ -358,6 +368,11 @@ app.post('/api/tasks', authMiddleware, async (req, res) => {
   const { projectId, title, description, priority, assigneeId, dueDate } = req.body;
   if (!projectId || !title) {
     return res.status(400).json({ error: 'Project ID and Title are required.' });
+  }
+
+  // Authorization check: Only admin and manager can create tasks
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Access Restrained: Only administrators and managers can create tasks.' });
   }
 
   try {
@@ -406,7 +421,22 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Task not found.' });
     }
 
+    // Authorization check
+    const isAssignee = String(task.assigneeId) === String(req.user._id);
+    const isAdminOrManager = (req.user.role === 'admin' || req.user.role === 'manager');
+    
+    if (!isAdminOrManager && !isAssignee) {
+      return res.status(403).json({ error: 'Access Restrained: Members can only edit tasks assigned to them.' });
+    }
+
     const { status, assigneeId, priority, title, description, dueDate } = req.body;
+    
+    // For members, restrict changing metadata
+    if (!isAdminOrManager) {
+      if (assigneeId !== undefined || priority !== undefined || dueDate !== undefined) {
+        return res.status(403).json({ error: 'Access Restrained: Only administrators and managers can edit task priority, assignee, or due dates.' });
+      }
+    }
     
     let changeLogged = false;
 
@@ -454,6 +484,12 @@ app.put('/api/tasks/:id', authMiddleware, async (req, res) => {
 
 app.delete('/api/tasks/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
+  // Authorization check: Only admin and manager can delete tasks
+  if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({ error: 'Access Restrained: Only administrators and managers can delete tasks.' });
+  }
+
   try {
     const task = await Task.findOneAndDelete({ _id: id, organizationId: req.org._id });
     if (!task) {
